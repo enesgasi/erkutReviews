@@ -87,7 +87,6 @@ def insert_data(conn, app_id, game_name, reviews):
         IF NOT EXISTS (SELECT 1 FROM Game WHERE AppId = ?)
         INSERT INTO Game (AppId, Name) VALUES (?, ?)
     """, app_id, app_id, game_name)
-
     for review in reviews:
         cursor.execute("""
             INSERT INTO Review (AppId, Date, Review) VALUES (?, ?, ?)
@@ -119,7 +118,7 @@ def fetch_and_store_reviews():
         setup_database(conn)
         insert_data(conn, app_id, game_name, reviews)
         conn.close()
-        messagebox.showinfo("Tamamlandı", f"{len(reviews)} tane inceleme '{game_name}' have been inserted into the database.")
+        messagebox.showinfo("Tamamlandı",  f'{game_name}'" için " f"{len(reviews)} inceleme çekildi.")
     except Exception as e:
         messagebox.showerror("Database Hatası", f"Error: {e}")
 
