@@ -154,9 +154,9 @@ Aşağıya bilgisayarınızda oluşturduğunuz database server'ının
 ismini, database in ismini ve kullanıcı bilgilerinizi girmeniz 
 gerekiyor.
 '''
-server = "ENES"
-database = "reviews"
-username = "sa"
-password = "123"
+server = ""
+database = ""
+username = ""
+password = ""
 
 window.mainloop()
