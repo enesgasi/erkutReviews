@@ -9,7 +9,7 @@ yükleyebilirsiniz
 import requests  # pip install requests
 from bs4 import BeautifulSoup  # pip install bs4
 import pyodbc  # pip install pyodbc
-import tkinter as tk #pip install tk
+import tkinter as tk # pip install tk
 from tkinter import messagebox
 import webbrowser
 
@@ -44,6 +44,7 @@ def get_steam_reviews(app_id, num_pages=2):
         for block in review_blocks:
             review_text = block.get_text(strip=True)
             reviews.append(review_text)
+
 
     return reviews
 
@@ -147,7 +148,12 @@ label_link = tk.Label(window, text="Aradığınız Oyunun App ID'sini öğrenmek
 label_link.pack(pady=10)
 label_link.bind("<Button-1>", lambda e: open_steamdb_link())
 
-# Database credentials !!BUNLARA DOKUNMAYIN!!
+'''
+Database creditentials
+Aşağıya bilgisayarınızda oluşturduğunuz database server'ının 
+ismini, database in ismini ve kullanıcı bilgilerinizi girmeniz 
+gerekiyor.
+'''
 server = "ENES"
 database = "reviews"
 username = "sa"
