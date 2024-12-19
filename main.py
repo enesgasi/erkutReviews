@@ -11,7 +11,10 @@ from bs4 import BeautifulSoup  # pip install bs4
 import pyodbc  # pip install pyodbc
 import tkinter as tk # pip install tk
 from tkinter import messagebox
+from tkinter import filedialog
 import webbrowser
+import json
+from docx import Document
 
 # Bu fonksiyon oyunun ismini almamıza yarıyor
 def get_game_name(app_id):
@@ -25,7 +28,7 @@ def get_game_name(app_id):
     return "Böyle bir oyun yok..."
 
 # Bu fonksiyon incelemeleri çekmeye yarıyor
-def get_steam_reviews(app_id, num_pages=2):
+def get_steam_reviews(app_id, num_pages=10):
     base_url = f"https://steamcommunity.com/app/{app_id}/reviews/"
     reviews = []
 
@@ -95,23 +98,107 @@ def insert_data(conn, app_id, game_name, reviews):
 
     conn.commit()
 
+# Word olarak kaydetme
+def save_as_word():
+    if not entry_app_id.get().isdigit():
+        messagebox.showerror("Hata", "App ID bir sayı olmalı!")
+        return
+
+    global reviews, app_id, game_name
+
+    app_id = entry_app_id.get().strip()
+    game_name = get_game_name(app_id)
+    reviews = get_steam_reviews(app_id)
+
+    if not reviews:
+        messagebox.showwarning("Uyarı", "Kaydedilecek bir inceleme bulunamadı")
+        return
+
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".docx",
+        filetypes=[("Word files", "*.docx")],
+        title="Save as Word"
+    )
+    if not file_path:
+        return
+
+    try:
+        from docx import Document
+        document = Document()
+        document.add_heading(f"Reviews for '{game_name}' (App ID: {app_id})", level=1)
+
+        for i, review in enumerate(reviews, start=1):
+            document.add_paragraph(f"Review {i}:")
+            document.add_paragraph(review)
+            document.add_paragraph()  # Blank line between reviews
+
+        document.save(file_path)
+        messagebox.showinfo("Tamamlandı", f"İncelemeler word dosyası olarak kaydedildi:\n{file_path}")
+    except Exception as e:
+        messagebox.showerror("Hata", f"Kayıt başarısız: {e}")
+
+# JSON olarak kaydetme
+def save_as_json():
+    if not entry_app_id.get().isdigit():
+        messagebox.showerror("Hata", "App ID bir sayı olmalı!")
+        return
+
+    global reviews, app_id, game_name
+
+    app_id = entry_app_id.get().strip()
+    game_name = get_game_name(app_id)
+    reviews = get_steam_reviews(app_id)
+
+    if not reviews:
+        messagebox.showwarning("Uyarı", "Kaydedilecek bir inceleme yok.")
+        return
+
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".json",
+        filetypes=[("JSON files", "*.json")],
+        title="Save as JSON"
+    )
+    if not file_path:
+        return
+
+    data = {
+        "App ID": app_id,
+        "Game Name": game_name,
+        "Reviews": reviews
+    }
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as json_file:
+            json.dump(data, json_file, indent=4, ensure_ascii=False)
+        messagebox.showinfo("Tamamlandı", f"İncelemeler JSON olarak kaydedildi: :\n{file_path}")
+    except Exception as e:
+        messagebox.showerror("Hata", f"Kayıt başarısız: {e}")
+
 
 def fetch_and_store_reviews():
-    app_id = entry_app_id.get()
+    app_id = entry_app_id.get().strip()
     if not app_id.isdigit():
         messagebox.showerror("Hata", "App ID bir sayı olmalı!")
         return
 
-    num_pages = 2  # Default number of pages
+    #Buradan kaç sayfalık veri çekeceğinizi belirleyebilirsiniz.
+    num_pages = 10
     game_name = get_game_name(app_id)
-    if game_name == "Böyle bir oyun yok...":
+    if game_name == "No such game exists...":
         messagebox.showerror("Hata", "Geçersiz App ID! Oyun bulunamadı.")
         return
 
     reviews = get_steam_reviews(app_id, num_pages)
     if not reviews:
-        messagebox.showwarning("Uyarı", f"Bu oyun için bir inceleme bulunamadı: '{game_name}'.")
+        messagebox.showwarning("Uyarı", f"Bu oyun için herhangi bir inceleme bulunamadı: '{game_name}'.")
         return
+
+
+    global current_reviews, current_game_name, current_app_id
+    current_reviews = reviews
+    current_game_name = game_name
+    current_app_id = app_id
+
 
     # MSSQL bağlantısı ve insertion
     try:
@@ -139,10 +226,18 @@ label_instruction.pack(pady=5)
 entry_app_id = tk.Entry(window, width=30)
 entry_app_id.pack(pady=5)
 
+button_frame = tk.Frame(window)
+button_frame.pack(pady=10)
 
-button_fetch = tk.Button(window, text="Çek", command=fetch_and_store_reviews)
-button_fetch.pack(pady=10)
+button_save_word = tk.Button(button_frame, text="Word olarak kaydet", command=save_as_word)
+button_save_word.pack(side=tk.LEFT, padx=5)
 
+button_save_json = tk.Button(button_frame, text="JSON olarak kaydet", command=save_as_json)
+button_save_json.pack(side=tk.LEFT, padx=5)
+
+# Insert to Database button
+button_fetch = tk.Button(button_frame, text="Veritabanına kaydet", command=fetch_and_store_reviews)
+button_fetch.pack(side=tk.LEFT, padx=5)
 
 label_link = tk.Label(window, text="Aradığınız Oyunun App ID'sini öğrenmek için tıklayın.", fg="blue", cursor="hand2")
 label_link.pack(pady=10)
