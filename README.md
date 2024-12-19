@@ -15,7 +15,7 @@ into the code.
 You enter the Steam App ID of the game you want to analyse and hit the submit button.
 The program scrapes the reviews and inserts them into your local database
 
-![Ekran görüntüsü 2024-12-18 162226](https://github.com/user-attachments/assets/7c0aba4c-5756-464a-8bb3-1b237b0873b3)
+![image](https://github.com/user-attachments/assets/02ced171-4e9a-4347-a68d-963f431cf536)
 
 ![Ekran görüntüsü 2024-12-18 162305](https://github.com/user-attachments/assets/d46e2a80-16a8-4f0d-8f7e-30f53f7aaf76)
 
