@@ -95,7 +95,7 @@ def insert_data(conn, app_id, game_name, reviews):
 
     conn.commit()
 
-# Kullanıcı arayüzü oluşturma
+
 def fetch_and_store_reviews():
     app_id = entry_app_id.get()
     if not app_id.isdigit():
