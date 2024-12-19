@@ -152,7 +152,7 @@ label_link.bind("<Button-1>", lambda e: open_steamdb_link())
 Database creditentials
 Aşağıya bilgisayarınızda oluşturduğunuz database server'ının 
 ismini, database in ismini ve kullanıcı bilgilerinizi girmeniz 
-gerekiyor.
+gerekiyor.  
 '''
 server = ""
 database = ""
